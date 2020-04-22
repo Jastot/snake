@@ -1,6 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
+using System.Linq;
+using System.Threading.Tasks;
+using System.Threading;
 
 namespace snake
 {
@@ -8,33 +11,45 @@ namespace snake
     {
         static void Main(string[] args)
         {
-           
-            Point p1 = new Point(1,3,'*');
-            p1.Draw();
-            
-            Point p2 = new Point(4,5,'#');
-            p2.Draw();
+            Console.SetWindowSize(80,25);
 
-            List<int> numList = new List<int>();
-            numList.Add(0);
-            numList.Add(1);
-            numList.Add(2);
+            Walls walls = new Walls(80, 25);
+            walls.Draw();
 
-            int x = numList[0];
-            int y = numList[1];
-            int z = numList[2];
+            Point p = new Point(4, 5, '*');
+            Snake snake = new Snake(p, 4, Direction.RIGHT);
+            snake.Draw();
 
-            foreach(int i in numList)
+            FoodCreator foodCreator = new FoodCreator(80, 25, '$');
+            Point food = foodCreator.CrateFood();
+            food.Draw();
+
+            while (true)
             {
-                Console.WriteLine(i);
+                if (walls.IsHit(snake) || snake.IsHitTail())
+                {
+                    break;
+
+                }
+                if(snake.Eat( food ) )
+                {
+                    food = foodCreator.CrateFood();
+                    food.Draw();
+                }
+                else
+                {
+                    snake.Move();
+                }
+                Thread.Sleep(100);
+                if (Console.KeyAvailable)
+                {
+                    ConsoleKeyInfo key = Console.ReadKey();
+                    snake.HandleKey(key.Key);
+                }
+                
+                
             }
-
-            List<Point> pList = new List<Point>();
-            pList.Add(p1);
-            pList.Add(p2);
-
-
-
+            
             Console.ReadLine();
         }
     
